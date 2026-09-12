@@ -54,9 +54,11 @@ uvicorn app.main:app --reload
 
 ## 项目结构
 
+```
 .
 ├── app/                 # 应用代码(models / schemas / services / utils)
 ├── alembic/             # 数据库迁移
 ├── Dockerfile
 ├── docker-compose.yml
 └── requirements.txt
+```
