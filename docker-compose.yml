@@ -1,14 +1,54 @@
 services:
   postgres:
-    image: postgres:15-alpine # 使用PostgreSQL 15的轻量版镜像
+    image: postgres:15-alpine
     environment:
-      POSTGRES_USER: ${DB_USER}         # 从 .env 读取数据库用户名
-      POSTGRES_PASSWORD: ${DB_PASSWORD} # 从 .env 读取数据库密码
-      POSTGRES_DB: ${DB_NAME}           # 从 .env 读取数据库名
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
     ports:
-      - "5432:5432" # 将容器的5432端口映射到本机的5432端口
+      - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data # 持久化数据，防止容器删除后数据丢失
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_HOST=postgres          # 关键:容器内用服务名,不是 localhost
+      - DB_PORT=5432
+      - DB_USER=${DB_USER}        # ${...} 自动从 .env 读
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - SECRET_KEY=${SECRET_KEY}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    command: sh -c "alembic upgrade head && exec uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/logs
 
 volumes:
   postgres_data:
+  redis_data:

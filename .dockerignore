@@ -1,0 +1,30 @@
+# ===== Python =====
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*.so
+
+# ===== Git =====
+.git/
+.gitignore
+
+# ===== 密钥与本地配置(严禁打进镜像) =====
+.env
+.env.*
+!.env.example
+
+# ===== 日志 =====
+logs/
+*.log
+
+# ===== IDE / 本地配置 =====
+.vscode/
+.idea/
+.claude/
+
+# ===== 构建时文件(镜像里用不到) =====
+Dockerfile
+docker-compose.yml
+
+# 注意:alembic/ 目录不要忽略,容器启动时要跑 alembic upgrade head
