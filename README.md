@@ -23,6 +23,7 @@ docker compose up -d --build
 
 ### 二：本地运行
 
+```
 python -m venv venv
 source venv/bin/activate      # Windows: venv\Scripts\activate
 pip install -r requirements.txt
@@ -30,6 +31,7 @@ pip install -r requirements.txt
 cp .env.example .env          # 填入真实配置
 alembic upgrade head
 uvicorn app.main:app --reload
+```
 
 ## 环境变量
 
