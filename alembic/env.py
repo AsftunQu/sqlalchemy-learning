@@ -12,7 +12,8 @@ from alembic import context
 config = context.config
 
 # 从环境变量注入连接串,覆盖 alembic.ini 里写死的地址(避免密码硬编码)
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+# 密码里若含特殊字符会被 URL 编码成 %XX,需转义为 %% 才能通过 configparser 的插值校验
+config.set_main_option("sqlalchemy.url", settings.DATABASE_URL.replace("%", "%%"))
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
